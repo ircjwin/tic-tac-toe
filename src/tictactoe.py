@@ -7,17 +7,22 @@ class TicTacToe:
         self.winner = False
         self.turns = 0
 
-        # Can be condensed into one list after game board is finessed
+        # Can be condensed into one list or dictionary after game board is finessed
         self.board = [[" ", " ", " "],
                       [" ", " ", " "],
                       [" ", " ", " "]]
 
-        self.rally = ["Ready up, ",
-                      "Go get 'em, ",
-                      "Never give up, ",
-                      "You can do it, ",
-                      "I believe in you, ",
-                      "Release your inner strength, "]
+        # Left to right: top 0-2, middle 3-5, bottom 6-8
+        self.test_board = [" ", " ", " ",
+                           " ", " ", " ",
+                           " ", " ", " "]
+
+        self.rally_cry = ["Ready up, ",
+                          "Go get 'em, ",
+                          "Never give up, ",
+                          "You can do it, ",
+                          "I believe in you, ",
+                          "Release your inner strength, "]
 
         self.commands = {
             "tl": (0, 0),
@@ -58,6 +63,50 @@ class TicTacToe:
             "Condition 8": ("tr", "mm", "bl")
         }
 
+        self.test_win_conditions = {
+            # Horizontals
+            "Condition 1": (0, 1, 2),
+            "Condition 2": (3, 4, 5),
+            "Condition 3": (6, 7, 8),
+            # Verticals
+            "Condition 4": (0, 3, 6),
+            "Condition 5": (1, 4, 7),
+            "Condition 6": (2, 5, 8),
+            # Diagonals
+            "Condition 7": (0, 4, 8),
+            "Condition 8": (2, 4, 6)
+        }
+
+        self.test_commands = {
+            "tl": 0,
+            "tc": 1,
+            "tr": 2,
+            "cl": 3,
+            "c": 4,
+            "cr": 5,
+            "bl": 6,
+            "bc": 7,
+            "br": 8
+        }
+
+        self.test_command_info = \
+            "tl: Top Left Square\n" \
+            "tc: Top Center Square\n" \
+            "tr: Top Right Square\n" \
+            "cl: Center Left Square\n" \
+            "c: Center Square\n" \
+            "cr: Center Right Square\n" \
+            "bl: Bottom Left Square\n" \
+            "bc: Bottom Center Square\n" \
+            "br: Bottom Right Square"
+
+    def test_print_board(self):
+        print(f" {self.test_board[0]} | {self.test_board[1]} | {self.test_board[2]}")
+        print("---|---|---")
+        print(f" {self.test_board[3]} | {self.test_board[4]} | {self.test_board[5]}")
+        print("---|---|---")
+        print(f" {self.test_board[6]} | {self.test_board[7]} | {self.test_board[8]}")
+
     # Finesse game board
     def print_board(self):
         for i in range(len(self.board)):
@@ -79,31 +128,32 @@ class TicTacToe:
 
         if self.turns == 0:
             print("Welcome to Tic-Tac-Toe!")
-        if self.player:
-            cry = random.randint(0, len(self.rally) - 1)
-            print(f'{self.rally[cry]}Player 1')
-        else:
-            cry = random.randint(0, len(self.rally) - 1)
-            print(f'{self.rally[cry]}Player 2')
-        print("(type 'commands' to see move list)")
+            print("(type 'commands' to see move list)\n")
 
-    def player_input(self, val):
-        if val.lower() == "exit":
+        if self.player:
+            index = random.randint(0, len(self.rally_cry) - 1)
+            print(f'{self.rally_cry[index]}Player 1!')
+        else:
+            index = random.randint(0, len(self.rally_cry) - 1)
+            print(f'{self.rally_cry[index]}Player 2!')
+
+    def player_input(self, user_cmd):
+        if user_cmd.lower() == "exit":
             quit()
 
-        if val.lower() == "commands":
+        if user_cmd.lower() == "commands":
             print(self.command_info)
             return 1
 
-        move = val.lower()
+        move = user_cmd.lower()
         if move not in self.commands:
-            print("Please enter a valid command")
+            print("Please enter a valid command.")
             return -1
 
         row, col = self.commands[move]
 
         if self.board[row][col] != " ":
-            print("Space already occupied")
+            print("Space already occupied.")
             return -1
 
         if self.player:
@@ -132,35 +182,27 @@ class TicTacToe:
 
             if fill == space_1 == space_2 == space_3:
                 self.winner = True
-                break
+                return
 
     def manager(self):
-        # while not self.winner or self.turns < 9:
-        while True:
+        while self.winner is False and self.turns < 9:
+            if self.turns > 0:
+                self.player = not self.player
             self.prompts()
             self.print_board()
+            cmd_check = 1
 
-            # while eval != 0
-            while True:
-                val = input(": ")
-                eval = self.player_input(val)
-                if eval == 0:
-                    self.turns += 1
-                    break
+            while cmd_check != 0:
+                user_cmd = input(": ")
+                cmd_check = self.player_input(user_cmd)
 
+            self.turns += 1
             self.check_winner()
-            if self.winner:
-                break
-
-            if self.turns == 9:
-                break
-
-            self.player = not self.player
 
         self.print_board()
         self.prompts()
-        val = input(": ")
-        if val.lower() == "n":
+        user_cmd = input(": ")
+        if user_cmd.lower() == "n":
             quit()
 
 
@@ -168,3 +210,7 @@ if __name__ == "__main__":
     while True:
         game = TicTacToe()
         game.manager()
+
+    # game = TicTacToe()
+    # game.test_print_board()
+
